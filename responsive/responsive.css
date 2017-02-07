@@ -6,7 +6,8 @@
     }
 }
 
-@media all and (min-width: 1201px) and (max-width: 1400px){
+@media all and (min-width: 1201px) 
+    and (max-width: 1400px){
     .ralphy {
         width: 250px; 
      	height: 185px;  
@@ -49,10 +50,3 @@
      	background: url(ralphy.gif) -250px -374px;
     }
 }
-
-
-
-
-
-
-
