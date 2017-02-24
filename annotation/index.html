@@ -10,10 +10,28 @@
 
 <h1 id="title">Fail</h1>
 
-<video src="https://www.cs.tufts.edu/comp/20/fail.mp4" id="failvideo" controls></video>
+<video src="https://www.cs.tufts.edu/comp/20/fail.mp4" id="failvideo" controls ontimeupdate="here()"></video>
+
 <div id="lyrics"></div>
 
 <script>
+function update() {
+	document.getElementById("lyrics").innerHTML += '<p class="message">'+'here'+'</p>';
+}
+
+function here(){
+	time = document.getElementById("failvideo").currentTime;
+	
+	document.getElementById("lyrics").innerHTML += '<p class="message">'+ time +'</p>';
+
+	
+
+}
+
+function myFunction() {
+   	document.getElementById("lyrics").innerHTML = "Hello World";
+}
+
 	// Complete this section and create a CSS file named style.css
 </script>
 </body>
