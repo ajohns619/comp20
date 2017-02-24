@@ -10,13 +10,26 @@
 
 <h1 id="title">Not Uber</h1>
 
-
+<div id="position"></div>
 
 <script>
-  
+function get_location() {
+if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(print);
+    } else { 
+        document.getElementById("position").innerHTML = "Geolocation is not supported by this browser.";
+    }
+}
 
+function print(position){
+    document.getElementById("position").innerHTML = '<p>' +"Latitude: " + position.coords.latitude + 
+    "<br>Longitude: " + position.coords.longitude + '</p>'; 
+
+}
+
+get_location();
 </script>
 
-
 </body>
+
 </html>
