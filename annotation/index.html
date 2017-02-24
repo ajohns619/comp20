@@ -10,14 +10,79 @@
 
 <h1 id="title">Fail</h1>
 
-<video src="https://www.cs.tufts.edu/comp/20/fail.mp4" id="failvideo" controls ontimeupdate="here()"></video>
+<video src="https://www.cs.tufts.edu/comp/20/fail.mp4" id="failvideo" controls ontimeupdate="update()"></video>
 
 <div id="lyrics"></div>
 
 <script>
 function update() {
-	document.getElementById("lyrics").innerHTML += '<p class="message">'+'here'+'</p>';
-}
+	time = document.getElementById("failvideo").currentTime;
+	if (time > 9 && time < 13){
+		document.getElementById("lyrics").innerHTML = '<p class="message">'
+		+"You've got me feelin' emotions"+'</p>';
+	}
+	else if (time > 13 && time < 17){
+		document.getElementById("lyrics").innerHTML = '<p class="message">'
+		+"Deeper than I've ever dreamed of"+'</p>';
+	}
+	/* replace and with &&:
+	else if (time > 17 and time < 21){
+		document.getElementById("lyrics").innerHTML = '<p class="message">'
+		+"You've got me feelin' emotions"+'</p>';
+	}
+	else if (time > 21 and time < 24){
+		document.getElementById("lyrics").innerHTML = '<p class="message">'
+		+"Higher than the heavens above"+'</p>';
+	}
+	else if (time > 24 and time < 29){
+		document.getElementById("lyrics").innerHTML = '<p class="message">'
+		+"I feel good, I feel nice"+'</p>';
+	}
+	else if (time > 29 and time < 34){
+		document.getElementById("lyrics").innerHTML = '<p class="message">'
+		+"I've never felt so satisfied"+'</p>';
+	}
+	else if (time > 34 and time < 39){
+		document.getElementById("lyrics").innerHTML = '<p class="message">'
+		+"I'm in love, I'm alive"+'</p>';
+	}
+	else if (time > 39 and time < 44){
+		document.getElementById("lyrics").innerHTML = '<p class="message">'
+		+"Intoxicated, flyin' high"+'</p>';
+	}
+	else if (time > 44 and time < 48){
+		document.getElementById("lyrics").innerHTML = '<p class="message">'
+		+"Feels like a dream (at ~44 second mark in video, you can hear it)"+'</p>';
+	}
+	else if (time > 48 and time < 51){
+		document.getElementById("lyrics").innerHTML = '<p class="message">'
+		+"When you touch me tenderly"+'</p>';
+	}
+	else if (time > 51 and time < 55){
+		document.getElementById("lyrics").innerHTML = '<p class="message">'
+		+"I don't know if it's real"+'</p>';
+	}
+	else if (time > 55 and time < 59){
+		document.getElementById("lyrics").innerHTML = '<p class="message">'
+		+"But I like the way I feel inside"+'</p>';
+	}
+	else if (time > 59 and time < 63){
+		document.getElementById("lyrics").innerHTML = '<p class="message">'
+		+"You've got me feelin' emotions"+'</p>';
+	}
+	else if (time > 63 and time < 67){
+		document.getElementById("lyrics").innerHTML = '<p class="message">'
+		+"Deeper than I've ever dreamed of"+'</p>';
+	}
+	else if (time > 67 and time < 71){
+		document.getElementById("lyrics").innerHTML = '<p class="message">'
+		+"You've got me feelin' emotions"+'</p>';
+	}
+	else if (time > 71 and time < 75){
+		document.getElementById("lyrics").innerHTML = '<p class="message">'
+		+"Higher than the heavens above"+'</p>';
+	}*/
+}	
 
 function here(){
 	time = document.getElementById("failvideo").currentTime;
