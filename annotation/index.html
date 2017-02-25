@@ -51,7 +51,7 @@ function update() {
 	}
 	else if (time > 44 && time < 48){
 		document.getElementById("lyrics").innerHTML = '<p class="message">'
-		+"Feels like a dream (at ~44 second mark in video, you can hear it)"+'</p>';
+		+"Feels like a dream"+'</p>';
 	}
 	else if (time > 48 && time < 51){
 		document.getElementById("lyrics").innerHTML = '<p class="message">'
@@ -80,6 +80,9 @@ function update() {
 	else if (time > 71 && time < 75){
 		document.getElementById("lyrics").innerHTML = '<p class="message">'
 		+"Higher than the heavens above"+'</p>';
+	} else if (time > 75){
+		document.getElementById("lyrics").innerHTML = '<p class="message">'
+		+'</p>';
 	}
 }	
 
