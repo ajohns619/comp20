@@ -8,19 +8,23 @@
 
 
     <script>
-    
+    var myLat = 0;
+    var myLng = 0;
+    var me;
+    var mapProp = {
+        center: me,
+        zoom: 10
+    };
+    var map;
+    var marker;
+    var infowindow;
 
     function myMap() {
-        var myLat = 0;
-        var myLng = 0;
-        var me = new google.maps.LatLng(42.4061378, -71.1191289);
-        var mapProp = {
-            center: me,
-            zoom: 10
-        };
+        
 
-        var map = new google.maps.Map(document.getElementById("map"), mapProp);
+        map = new google.maps.Map(document.getElementById("map"), mapProp);
         get_location();
+        map.panTo(new google.maps.LatLng(41.4061378, -71.1191289));
     }
 
 
