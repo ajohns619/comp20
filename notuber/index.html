@@ -1,35 +1,67 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<meta charset="utf-8" />
-<title>Not Uber</title>
-<link rel="stylesheet" href="style.css" type="text/css" />
-</head>
+    <title>Black Car Service</title>
+    <link rel="stylesheet" href="style.css"/>
+    <meta charset="utf-8" />
 
-<body>
 
-<h1 id="title">Not Uber</h1>
-
-<div id="position"></div>
-
-<script>
-function get_location() {
-if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(print);
-    } else { 
-        document.getElementById("position").innerHTML = "Geolocation is not supported by this browser.";
+    <script>
+    function myMap() {
+        var mapProp= {
+        center:new google.maps.LatLng(51.508742,-0.120850),
+        zoom:5,
+        };
+        get_location();
+        var map=new google.maps.Map(document.getElementById("map"),mapProp);
     }
-}
 
-function print(position){
-    document.getElementById("position").innerHTML = '<p>' +"Latitude: " + position.coords.latitude + 
-    "<br>Longitude: " + position.coords.longitude + '</p>'; 
 
-}
+    function get_location() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(print);
+        } else { 
+            document.getElementById("location").innerHTML = "Geolocation is not supported by this browser.";
+        }
+    }
 
-get_location();
-</script>
+    function print(position){
+        document.getElementById("location").innerHTML = '<p>' +"Latitude: " + position.coords.latitude + 
+        "<br>Longitude: " + position.coords.longitude + '</p>'; 
+
+    }
+
+    function reqListener () {
+        console.log(this.responseText);
+    }
+
+
+    /*var params = "username=ImjNJW4n&lat="
+    params += 
+    var Req = new XMLHttpRequest();
+    Req.addEventListener("load", reqListener);
+    Req.open("GET", "http://www.example.org/example.txt");
+    Req.send();*/
+
+
+
+    </script>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDbnKWhNaXjq-ChDKgDnt5P2jaa8YGP_TM&callback=myMap"></script>
+
+</head>
+    <body onload="myMap()">
+
+    <h1 id="title">Black Car Service</h1>
+
+    <div id="map"></div>
+
+    <div id="location" onload="get_location()"></div>
+
 
 </body>
-
 </html>
+
+
+
