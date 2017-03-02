@@ -10,117 +10,103 @@
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDbnKWhNaXjq-ChDKgDnt5P2jaa8YGP_TM&callback=myMap"></script>
 
     <script>
-    var myLat = 42.405405599999995;
-    var myLng = -71.12140029999999;
+    var tufts_lat = 42.405405599999995;
+    var tufts_lng = -71.12140029999999;
+    var myLat = 0;
+    var myLng = 0;
     var me;
     var mapProp = {
         center: me,
-        zoom: 14
+        zoom: 14,
     };
     var map;
     var marker;
-    var infowindow;
     var me_icon = "me-icon.png";
     var passenger_icon = "passenger-icon.png";
     var car_icon = "black-car.png";
 
+    var infowindow;
+
     function myMap () {
         map = new google.maps.Map(document.getElementById("map"), mapProp);
         get_location();
-        map.panTo(new google.maps.LatLng(42.405405599999995, -71.12140029999999));
+        map.panTo(new google.maps.LatLng(tufts_lat, tufts_lng));
         loadOthers();
     }
 
     function get_location() {
         if (navigator.geolocation) {
             //navigator.geolocation.getCurrentPosition(print);
-            navigator.geolocation.getCurrentPosition(display);
+            navigator.geolocation.getCurrentPosition(function(position) {
+                myLat = position.coords.latitude;
+                myLng = position.coords.longitude;
+                render_map();
+            })
         } else { 
             document.getElementById("location").innerHTML = "Geolocation is not supported by this browser.";
         }
     }
 
-    function print(position){
-        document.getElementById("location").innerHTML += '<p>' + "Latitude: " + position.coords.latitude + 
-        "<br>Longitude: " + position.coords.longitude + '</p>'; 
-
-    }
-
-    function display(position) {
-        myLat = position.coords.latitude;
-        myLng = position.coords.longitude;
-        render_map();
-    }
-
     function render_map() {
         me = new google.maps.LatLng(myLat, myLng);
-        //document.getElementById("location").innerHTML += '<p>' + myLat + ' 12 ' + myLng + '</p>';
 
         map.panTo(me);
-
-        // Create a marker
-        marker = new google.maps.Marker({
-            position: me,
-            title: "Here I Am!",
-            icon: me_icon
-        });
-        marker.setMap(map);
-
-
-        //DEFINE INFO WINDOW SOMEWHERE
-        google.maps.event.addListener(marker, 'click', function() {
-            infowindow.setContent(marker.title);
-            infowindow.open(map, marker);
-        });
+        addToMap(myLat, myLng, "Here I Am!", "me");
     }
 
     function loadOthers() {
         request = new XMLHttpRequest();
         request.open("POST", "https://defense-in-derpth.herokuapp.com/submit", true);
-
-        var params = "username=ImjNJW4n&lat=" + myLat + "&lng=" + myLng;
-
         request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 
         request.onreadystatechange = function() {
             if (request.readyState == 4 && request.status == 200){
                 var response = request.responseText;
-                //console.log(response);
                 var responseObject = JSON.parse(response);
-                var list;
-            
+
                 var category = "passengers";
                 if (responseObject.passengers === undefined){
                     category = "vehicles";
-                    list = responseObject.vehicles;
+                    var list = responseObject.vehicles;
                 } else {
-                    list = responseObject.passengers;
+                    var list = responseObject.passengers;
                 }
 
                 for (var i = 0; i < list.length; i++){
                     var user = list[i];
-                    //console.log(list[i].username);
                     addToMap(user.lat, user.lng, user.username, category);
                 }
-                //document.getElementById("location").innerHTML += '<p>' + object[1].id  + ' ' + object[1].id + '</p>';
             }
         };
+        var params = "username=ImjNJW4n&lat=" + myLat + "&lng=" + myLng;
         request.send(params);
     }
 
     function addToMap(lat, lng, username, category) {
-        var icon = me_icon;
         if (category == "passengers"){
-            icon = passenger_icon;
+            var icon = passenger_icon;
         } else if (category == "vehicles"){
-            icon = car_icon;
+            var icon = car_icon;
+        } else if (category == "me"){
+            var icon = me_icon;
         }
+
+        var infowindow = new google.maps.InfoWindow();
+        // Create marker
+
         marker = new google.maps.Marker({
             position: new google.maps.LatLng(lat, lng),
             title: username,
             icon: icon
         });
         marker.setMap(map);
+
+        google.maps.event.addListener(marker, 'click', (function(marker, infowindow) {
+            return function() {
+                infowindow.setContent(marker.title);
+                infowindow.open(map, marker);
+            };
+        })(marker, infowindow));
     }
 
     </script>
@@ -131,8 +117,6 @@
     <h1 id="title">Black Car Service</h1>
 
     <div id="map"></div>
-
-    <div id="location"></div>
 
 </body>
 </html>
