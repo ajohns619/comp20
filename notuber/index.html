@@ -7,24 +7,26 @@
     <meta charset="utf-8" />
 
 
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDbnKWhNaXjq-ChDKgDnt5P2jaa8YGP_TM&callback=myMap"></script>
+
     <script>
-    var myLat = 0;
-    var myLng = 0;
+    var myLat = 42.405405599999995;
+    var myLng = -71.12140029999999;
     var me;
     var mapProp = {
         center: me,
-        zoom: 10
+        zoom: 12
     };
     var map;
     var marker;
     var infowindow;
+    var me_icon = "https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-person-128.png"
 
-    function myMap() {
-        
-
+    function myMap () {
         map = new google.maps.Map(document.getElementById("map"), mapProp);
         get_location();
-        map.panTo(new google.maps.LatLng(41.4061378, -71.1191289));
+        map.panTo(new google.maps.LatLng(42.405405599999995, -71.12140029999999));
+        loadOthers();
     }
 
 
@@ -56,14 +58,19 @@
         
         // Update map and go there...
         map.panTo(me);
-    
+        /*me_icon.style.width = '20px';
+        me_icon.style.height = '20px';*/
+
         // Create a marker
         marker = new google.maps.Marker({
             position: me,
-            title: "Here I Am!"
+            title: "Here I Am!",
+            icon: me_icon
         });
         marker.setMap(map);
 
+
+        //DEFINE INFO WINDOW SOMEWHERE
         google.maps.event.addListener(marker, 'click', function() {
             infowindow.setContent(marker.title);
             infowindow.open(map, marker);
@@ -71,23 +78,51 @@
 
     }
 
+    function loadOthers() {
+        request = new XMLHttpRequest();
+        request.open("POST", "https://defense-in-derpth.herokuapp.com/submit", true);
+
+        var params = "username=ImjNJW4n&lat=" + myLat + "&lng=" + myLng;
+        console.log(params);
+
+        request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+        request.onreadystatechange = function() {
+            var response = request.responseText;
+            //console.log(response);
+
+            var responseObject = JSON.parse(response);
+            //if (responseObject.passengers.length) -- switch between passengers and cars based on response
+            //console.log(list.passengers.length);
+            var list = responseObject.passengers;
+            for (var i = 0; i < list.length; i++){
+                var user = list[i];
+                //console.log(list[i].username);
+                addToMap(user.lat, user.lng, user.username);
+            }
+            //document.getElementById("location").innerHTML += '<p>' + object[1].id  + ' ' + object[1].id + '</p>';
+        };
+        request.send(params);
+    }
+
+    function addToMap(lat, lng, username) {
+        marker = new google.maps.Marker({
+            position: new google.maps.LatLng(lat, lng),
+            title: username,
+            icon: me_icon
+        });
+        marker.setMap(map);
+    }
+
     function reqListener () {
+        console.log("Something is happening");
+
+        // Step 5: do something with the response data...
+        console.log(request.responseText);
         console.log(this.responseText);
     }
 
-
-    /*var params = "username=ImjNJW4n&lat="
-    params += 
-    var Req = new XMLHttpRequest();
-    Req.addEventListener("load", reqListener);
-    Req.open("GET", "http://www.example.org/example.txt");
-    Req.send();*/
-
-
-
     </script>
-
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDbnKWhNaXjq-ChDKgDnt5P2jaa8YGP_TM&callback=myMap"></script>
 
 </head>
     <body onload="myMap()">
@@ -96,11 +131,7 @@
 
     <div id="map"></div>
 
-    <div id="location" onload="get_location()"></div>
-
+    <div id="location"></div>
 
 </body>
 </html>
-
-
-
