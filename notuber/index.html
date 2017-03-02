@@ -83,25 +83,27 @@
         request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 
         request.onreadystatechange = function() {
-            var response = request.responseText;
-            //console.log(response);
-            var responseObject = JSON.parse(response);
-            var list;
+            if (request.readyState == 4 && request.status == 200){
+                var response = request.responseText;
+                //console.log(response);
+                var responseObject = JSON.parse(response);
+                var list;
             
-            var category = "passengers";
-            if (responseObject.passengers === undefined){
-                category = "vehicles";
-                list = responseObject.vehicles;
-            } else {
-                list = responseObject.passengers;
-            }
+                var category = "passengers";
+                if (responseObject.passengers === undefined){
+                    category = "vehicles";
+                    list = responseObject.vehicles;
+                } else {
+                    list = responseObject.passengers;
+                }
 
-            for (var i = 0; i < list.length; i++){
-                var user = list[i];
-                //console.log(list[i].username);
-                addToMap(user.lat, user.lng, user.username, category);
+                for (var i = 0; i < list.length; i++){
+                    var user = list[i];
+                    //console.log(list[i].username);
+                    addToMap(user.lat, user.lng, user.username, category);
+                }
+                //document.getElementById("location").innerHTML += '<p>' + object[1].id  + ' ' + object[1].id + '</p>';
             }
-            //document.getElementById("location").innerHTML += '<p>' + object[1].id  + ' ' + object[1].id + '</p>';
         };
         request.send(params);
     }
