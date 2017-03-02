@@ -7,7 +7,7 @@
     <meta charset="utf-8" />
 
 
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDbnKWhNaXjq-ChDKgDnt5P2jaa8YGP_TM&callback=myMap"></script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDbnKWhNaXjq-ChDKgDnt5P2jaa8YGP_TM&libraries=geometry"> </script>
 
     <script>
     var tufts_lat = 42.405405599999995;
@@ -27,11 +27,15 @@
 
     var infowindow;
 
-    function myMap () {
+    function myMap() {
         map = new google.maps.Map(document.getElementById("map"), mapProp);
         get_location();
         map.panTo(new google.maps.LatLng(tufts_lat, tufts_lng));
         loadOthers();
+
+        p1 = new google.maps.LatLng(tufts_lat, tufts_lng);
+        p2 = new google.maps.LatLng(42.485405599999995, -71.15140029999999);
+        console.log(google.maps.geometry.spherical.computeDistanceBetween(p1, p2));
     }
 
     function get_location() {
@@ -103,12 +107,47 @@
 
         google.maps.event.addListener(marker, 'click', (function(marker, infowindow) {
             return function() {
-                infowindow.setContent(marker.title);
+                //console.log(google.maps.geometry.spherical.computeDistanceBetween(marker.position, me));
+                var distance = 0;
+                if (me != null){
+                    distance = google.maps.geometry.spherical.computeDistanceBetween(me, marker.position)
+                                    * 0.000621371;
+                    distance = Math.round(distance * 1000) / 1000;
+                }
+                var content = 'Username: ' + marker.title + '<br>Distance: ' + distance + ' Miles';
+                infowindow.setContent(content);
                 infowindow.open(map, marker);
+
             };
         })(marker, infowindow));
     }
+/*
+    function toRad(x) {
+        return x * Math.PI / 180;
+    }
+    function distance(loc1, loc2){
+        console.log(loc1.latitude);
+        var lat2 = loc2.latitude; 
+        var lon2 = loc2.longitude; 
+        var lat1 = loc1.latitude;
+        var lon1 = loc1.longitude; 
 
+        var R = 6371; // km 
+        //has a problem with the .toRad() method below.
+        var x1 = lat2-lat1;
+        console.log(x1);
+        var dLat = toRad(x1);  
+        var x2 = lon2-lon1;
+        var dLon = toRad(x2);  
+        var a = Math.sin(dLat/2) * Math.sin(dLat/2) + 
+                Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2);  
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+        console.log(c);
+        var d = R * c; 
+        return d;
+    }
+*/
     </script>
 
 </head>
