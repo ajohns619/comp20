@@ -15,12 +15,14 @@
     var me;
     var mapProp = {
         center: me,
-        zoom: 12
+        zoom: 14
     };
     var map;
     var marker;
     var infowindow;
-    var me_icon = "https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-person-128.png"
+    var me_icon = "me-icon.png";
+    var passenger_icon = "passenger-icon.png";
+    var car_icon = "black-car.png";
 
     function myMap () {
         map = new google.maps.Map(document.getElementById("map"), mapProp);
@@ -28,7 +30,6 @@
         map.panTo(new google.maps.LatLng(42.405405599999995, -71.12140029999999));
         loadOthers();
     }
-
 
     function get_location() {
         if (navigator.geolocation) {
@@ -52,14 +53,10 @@
     }
 
     function render_map() {
-        
         me = new google.maps.LatLng(myLat, myLng);
-        document.getElementById("location").innerHTML += '<p>' + myLat + ' 12 ' + myLng + '</p>';
-        
-        // Update map and go there...
+        //document.getElementById("location").innerHTML += '<p>' + myLat + ' 12 ' + myLng + '</p>';
+
         map.panTo(me);
-        /*me_icon.style.width = '20px';
-        me_icon.style.height = '20px';*/
 
         // Create a marker
         marker = new google.maps.Marker({
@@ -75,7 +72,6 @@
             infowindow.setContent(marker.title);
             infowindow.open(map, marker);
         });
-
     }
 
     function loadOthers() {
@@ -83,43 +79,46 @@
         request.open("POST", "https://defense-in-derpth.herokuapp.com/submit", true);
 
         var params = "username=ImjNJW4n&lat=" + myLat + "&lng=" + myLng;
-        console.log(params);
 
         request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 
         request.onreadystatechange = function() {
             var response = request.responseText;
             //console.log(response);
-
             var responseObject = JSON.parse(response);
-            //if (responseObject.passengers.length) -- switch between passengers and cars based on response
-            //console.log(list.passengers.length);
-            var list = responseObject.passengers;
+            var list;
+            
+            var category = "passengers";
+            if (responseObject.passengers === undefined){
+                category = "vehicles";
+                list = responseObject.vehicles;
+            } else {
+                list = responseObject.passengers;
+            }
+
             for (var i = 0; i < list.length; i++){
                 var user = list[i];
                 //console.log(list[i].username);
-                addToMap(user.lat, user.lng, user.username);
+                addToMap(user.lat, user.lng, user.username, category);
             }
             //document.getElementById("location").innerHTML += '<p>' + object[1].id  + ' ' + object[1].id + '</p>';
         };
         request.send(params);
     }
 
-    function addToMap(lat, lng, username) {
+    function addToMap(lat, lng, username, category) {
+        var icon = me_icon;
+        if (category == "passengers"){
+            icon = passenger_icon;
+        } else if (category == "vehicles"){
+            icon = car_icon;
+        }
         marker = new google.maps.Marker({
             position: new google.maps.LatLng(lat, lng),
             title: username,
-            icon: me_icon
+            icon: icon
         });
         marker.setMap(map);
-    }
-
-    function reqListener () {
-        console.log("Something is happening");
-
-        // Step 5: do something with the response data...
-        console.log(request.responseText);
-        console.log(this.responseText);
     }
 
     </script>
