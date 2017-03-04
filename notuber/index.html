@@ -4,7 +4,9 @@
 <head>
     <title>Black Car Service</title>
     <link rel="stylesheet" href="style.css"/>
+    
     <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 
 
     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDbnKWhNaXjq-ChDKgDnt5P2jaa8YGP_TM&libraries=geometry"> </script>
@@ -29,25 +31,25 @@
 
     function myMap() {
         map = new google.maps.Map(document.getElementById("map"), mapProp);
-        get_location();
+        getLocation();
         map.panTo(new google.maps.LatLng(tufts_lat, tufts_lng));
         loadOthers();
     }
 
-    function get_location() {
+    function getLocation() {
         if (navigator.geolocation) {
             //navigator.geolocation.getCurrentPosition(print);
             navigator.geolocation.getCurrentPosition(function(position) {
                 myLat = position.coords.latitude;
                 myLng = position.coords.longitude;
-                render_map();
+                renderMap();
             })
         } else { 
             document.getElementById("location").innerHTML = "Geolocation is not supported by this browser.";
         }
     }
 
-    function render_map() {
+    function renderMap() {
         me = new google.maps.LatLng(myLat, myLng);
 
         map.panTo(me);
@@ -65,11 +67,13 @@
                 var responseObject = JSON.parse(response);
 
                 var category = "passengers";
-                if (responseObject.passengers === undefined){
+                if (responseObject.passengers !== undefined){
+                    var list = responseObject.passengers;
+                } else if (responseObject.vehicles !== undefined){
                     category = "vehicles";
                     var list = responseObject.vehicles;
                 } else {
-                    var list = responseObject.passengers;
+                    return;
                 }
 
                 for (var i = 0; i < list.length; i++){
