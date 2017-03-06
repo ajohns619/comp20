@@ -27,7 +27,7 @@
     var passenger_icon = "passenger-icon.png";
     var car_icon = "black-car.png";
 
-    var infowindow;
+    var infowindow = new google.maps.InfoWindow();
 
     function myMap() {
         map = new google.maps.Map(document.getElementById("map"), mapProp);
@@ -95,8 +95,6 @@
             var icon = me_icon;
         }
 
-        var infowindow = new google.maps.InfoWindow();
-
         marker = new google.maps.Marker({
             position: new google.maps.LatLng(lat, lng),
             title: username,
@@ -104,20 +102,18 @@
         });
         marker.setMap(map);
 
-        google.maps.event.addListener(marker, 'click', (function(marker, infowindow) {
-            return function() {
-                var distance = 0;
+        google.maps.event.addListener(marker, 'click', (function() {
+                var content = 'Username ' + this.title;
                 if (me != null){
-                    distance = google.maps.geometry.spherical.computeDistanceBetween(me, marker.position)
+                    var distance = google.maps.geometry.spherical.computeDistanceBetween(me, this.position)
                                     * 0.000621371;
                     distance = Math.round(distance * 1000) / 1000;
+                
+                    content += ' <br>Distance: ' + distance + ' Miles';
                 }
-                var content = 'Username: ' + marker.title + '<br>Distance: ' + distance + ' Miles';
                 infowindow.setContent(content);
-                infowindow.open(map, marker);
-
-            };
-        })(marker, infowindow));
+                infowindow.open(map, this);
+            }));
     }
 
     </script>
