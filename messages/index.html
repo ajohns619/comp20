@@ -6,6 +6,17 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
   <script>
     // Complete this section...
+    	$(document).ready(function(){
+    		$.get("https://messagehub.herokuapp.com/messages.json", function(text){
+    			$("#messages").text("");
+    			$.each(text, function(index, item){
+    				var new_text = $("#messages").html();
+    				new_text += "<p>" + item.content + " by " + item.username + "</p>";
+    				$("#messages").html(new_text);
+    			})
+    		})
+    	})
+
   </script>
 </head>
 
