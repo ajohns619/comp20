@@ -3,7 +3,7 @@
 
 <head>
     <title>Black Car Service</title>
-    <link rel="stylesheet" href="style.css"/>
+    <link rel="stylesheet" href="uber_style.css"/>
     
     <meta charset="utf-8" />
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
@@ -23,9 +23,9 @@
     };
     var map;
     var marker;
-    var me_icon = "me-icon.png";
-    var passenger_icon = "passenger-icon.png";
-    var car_icon = "black-car.png";
+    var me_icon = "me_icon.png";
+    var passenger_icon = "passenger_icon.png";
+    var car_icon = "black_car.png";
 
     var infowindow = new google.maps.InfoWindow();
 
@@ -38,18 +38,17 @@
 
     function getLocation() {
         if (navigator.geolocation) {
-            //navigator.geolocation.getCurrentPosition(print);
             navigator.geolocation.getCurrentPosition(function(position) {
                 myLat = position.coords.latitude;
                 myLng = position.coords.longitude;
-                renderMap();
+                addUserToMap();
             })
         } else { 
             document.getElementById("location").innerHTML = "Geolocation is not supported by this browser.";
         }
     }
 
-    function renderMap() {
+    function addUserToMap() {
         me = new google.maps.LatLng(myLat, myLng);
 
         map.panTo(me);
