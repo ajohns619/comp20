@@ -10,9 +10,7 @@
     		$.get("https://messagehub.herokuapp.com/messages.json", function(text){
     			$("#messages").text("");
     			$.each(text, function(index, item){
-    				var new_text = $("#messages").html();
-    				new_text += "<p>" + item.content + " by " + item.username + "</p>";
-    				$("#messages").html(new_text);
+    				$("#messages").html($("#messages").html() + "<p>" + item.content + " by " + item.username + "</p>");
     			})
     		})
     	})
