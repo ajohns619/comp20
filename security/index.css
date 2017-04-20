@@ -1,0 +1,86 @@
+body {
+	margin-left: 20%;
+	margin-right: 20%;
+}
+
+#nosql1{
+	background-image: url("nosql_inj_1.png"); 
+	height: 120px;
+	width: 800px;
+	background-size: 800px 120px;
+	background-repeat: no-repeat;
+}
+
+#nosql2{
+	background-image: url("nosql_inj_2.png"); 
+	height: 120px;
+	width: 950px;
+	background-size: 950px 120px;
+	background-repeat: no-repeat;
+}
+
+#nosqlcode{
+	background-image: url("nosql_code.png"); 
+	height: 120px;
+	width: 440px;
+	background-size: 440px 120px;
+	background-repeat: no-repeat;
+}
+
+#indexsort{
+	background-image: url("index_sort.png"); 
+	height: 420px;
+	width: 800px;
+	background-size: 800px 420px;
+	background-repeat: no-repeat;
+}
+
+#indexsortcode{
+	background-image: url("index_sort_code.png"); 
+	height: 200px;
+	width: 550px;
+	background-size: 550px 200px;
+	background-repeat: no-repeat;
+}
+
+#corscode{
+	background-image: url("corscode.png"); 
+	height: 40px;
+	width: 550px;
+	background-size: 550px 40px;
+	background-repeat: no-repeat;
+}
+
+#cors1{
+	background-image: url("cors1.png"); 
+	height: 55px;
+	width: 650px;
+	background-size: 650px 55px;
+	background-repeat: no-repeat;
+	margin: 5px;
+}
+#cors2{
+	background-image: url("cors2.png"); 
+	height: 55px;
+	width: 650px;
+	background-size: 650px 55px;
+	background-repeat: no-repeat;
+	margin: 5px;
+}
+#cors3{
+	background-image: url("cors3.png"); 
+	height: 55px;
+	width: 650px;
+	background-size: 650px 55px;
+	background-repeat: no-repeat;
+	margin: 5px;
+}
+
+
+
+
+
+
+
+
+

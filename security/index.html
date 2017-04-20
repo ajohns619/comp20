@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html  lang="en">
+
+<head>
+    <title>Security Assessment</title>
+    <link rel="stylesheet" href="index.css"/>
+    <script type="text/javascript" src="hacking_ming.js"></script>
+    
+    <meta charset="utf-8"/>
+</head>
+<body onload="hack_ming()">
+
+<h1>Security Assessment</h1>
+<h2>1. Introduction</h2>
+	<p>
+	The NotUber web application and NotUber server are the two components to the NotUber system, which connects vehicles to passengers who have requested a ride. The web application submits, using HTTP Post, a username, latitude, and longitude, all encoded in JSON, to the server. These passengers and vehicles are saved in respective MongoDB collections.
+	</p>
+	<p>The server supports the following routes:</p>
+		<ul>
+		<li>GET /: The passengers are displayed in a list on the index page of the Server.</li>
+		<li>GET /vehicle.json followed by username query: Displays an html page with the vehicles returned from that query</li>
+		<li>POST /submit: followed by username, lat, lng: Saves that user in either vehicles or passengers database</li>
+		</ul>
+
+	<p>
+	In the following paragraphs I will analyze the Server at http://stormy-springs-77997.herokuapp.com/ as well as the corresponding web application to find security issues and recommend steps to improve the page's security.
+	</p>
+
+<h2>2. Methodology</h2>
+	<p>Describe your methodology pen testing the application, including the tools that you used</p>
+
+	<p>Hacking Nodejs and mongodb: http://blog.websecurify.com/2014/08/hacking-nodejs-and-mongodb.html</p>
+
+	<p>Prevention Cheat Sheet: https://www.owasp.org/index.php/XSS_(Cross_Site_Scripting)_Prevention_Cheat_Sheet#RULE_.237_-_Prevent_DOM-based_XSS
+	</p>
+
+	<p>Mongodb injection defense, use explicit query selectors: https://thecodebarbarian.wordpress.com/2014/09/04/defending-against-query-selector-injection-attacks/</p>
+
+<h2>3. Abstract of Findings</h2>
+	<p>Provide an overview of all the security and privacy issues you identified. This section should be written for non-technical managers who do not have technical expertise and do not have time to read the entire document. Write this section using lay language.</p>
+
+<h2>4. Issues Found</h2>
+	<p>For each issue that you find, document:</p>
+	<ul>
+	<li> Issue (e.g., database injection, really bad programming practice)</li>
+	<li> Location or page where issue was found</li>
+	<li> Severity of issue (e.g., low, medium , or high). Justify your answer.</li>
+	<li> Description of issue. How did you find it? A screenshot of problem is excellent.</li>
+	<li> Proof of vulnerability. Show pictures or it didn't happen.</li>
+	<li> Resolution. Make recommendation(s) on how issue can be resolved. Show code if possible.</li>
+	</ul>
+
+
+
+	<h3>vehicle.json DB Query Trusts User Input</h3>
+	<ul>
+	<li><h4>Issue</h4>
+	<p>NoSQL Injection</p></li>
+	<li><h4>Location</h4>
+	<p>GET /vehicle.json route</p></li>
+
+	<li><h4>Severity of issue</h4>
+	<p>HIGH</p>
+	<p>A client should only be able to access information about vehicles to which the username is known. However, this injection makes it possible for the client to find both usernames and the corresponding information, which may be sensitive (for example a user's location).</p></li>
+
+	<li><h4> Description of Issue</h4>
+	<p>When entering the following url: http://defense-in-derpth.com/vehicle.json?username[$ne]=, the page returns a json containing the information of the first vehicle in the database, even without knowing the vehicle's username. Additionally, the url can be changed to: http://defense-in-derpth.com/vehicle.json?username[$ne]=[INSERT_FIRST_VEHICLE_USERNAME] to return the second user in the database.</p>
+	<p>Even though the query is designed to only return 1 user, by switching "[$ne]=" to "[$gt]=JANET" and then replacing JANET with the username the route returned I was able to get 6 more usernames besides "JANET":</p>
+	<ul>
+		<li>aSOqNo4S</li>
+		<li>cQRzspF5</li>
+		<li>itShXf78</li>
+		<li>w8XMS577</li>
+		<li>wtDRzig8</li>
+		<li>ym2J1vil</li>
+	</ul>
+	<p>And by using the same technique with "[$lt]=JANET", I could get another 2:</p>
+	<ul>
+		<li>4aTtB30R</li>
+		<li>1fH5MXna</li>
+	</ul>
+	<p>Thus I gained access to 9 usernames without even looking at the source code or knowing a single one going in. This is a catastrophic flaw. See issue number 3 for the evil thing I did with these.</p>
+
+
+	<div id=nosqlcode></div>
+	<p>Above is the problematic code. It takes the usernameEntry query string and uses that as the query without validation.</p>
+	</li>
+
+	<li><h4> Proof of Vulnerability. Show pictures or it didn't happen.</h4>
+	<div id=nosql1></div>
+	<div id=nosql2></div>
+	</li>
+
+	<li><h4> Resolution</h4>
+	<p>This can be resolved quite easily by changing the query from {username:usernameEntry} to {username:{$eq: usernameEntry}}.
+	This specifies the query selector, so the client cannot specify their own (for example: $not NULL).
+	</p></li>
+	</ul>
+
+
+
+
+
+	<h3>Index Displays Users in Incorrect Order</h3>
+	<ul>
+	<li><h4>Issue</h4>
+	<p>Divergence from the API contracts as specified in the <a href="https://tuftsdev.github.io/WebProgramming/assignments/a3.html">assignment instructions</a>.</p></li>
+	<li><h4>Location</h4>
+	<p>GET / route</p></li>
+
+	<li><h4>Severity of issue</h4>
+	<p>MEDIUM</p>
+	<p>
+		This is not necessarily a security issue, however since declaring one thing in a route contract and executing another in the function can get confusing for developers relying on this API, and could become a nightmare to maintain
+	</p></li>
+
+	<li><h4> Description of Issue</h4>
+	<p>
+		When loading the passengers onto the HTML page that is sent when the GET / route is accessed, the program sorts them based on _id, not created_at. This means that the passenger with the highest _id value rises to the top, instead of the passenger with the most recent timestamp. The likely behavior is that the passengers are sorted based on when they submitted their first submission. Thus the code is technically correct, until passengers start submitting multiple submissions, updating their locations and thus their timestamp.
+	</p>
+	<div id=indexsortcode></div>
+	</li>
+	<li><h4> Proof of Vulnerability. Show pictures or it didn't happen.</h4>
+	<div id=indexsort></div>
+	<p>These passengers are clearly not sorted based on timestamp.</p>
+	</li>
+
+	<li><h4> Resolution</h4>
+	<p>
+		This problem can be resolved by changing the query shown above (line 94) from {"_id":-1} to {"created_at":-1}. This will allow the page to follow the documentation even when passengers submit multiple resposes (HIGHLY LIKELY!).
+	</p></li>
+	</ul>
+
+
+
+
+
+
+	<h3>CORS is Enabled on the POST /submit Route</h3>
+	<ul>
+	<li><h4>Issue</h4>
+		<p>CORS is enabled on the /submit route, which means that the data does not need to come from an authenticated user, it can come from anyone (LIKE ME!) or any HTML file with a script tag (LIKE THIS PAGE!).</p>
+	</li>
+	<li><h4>Location</h4>
+	<p>The problem is that lines 15 and 16 enable CORS for the /submit route. These specific commands allow the POST request to come from any domain.</p>
+	<div id=corscode></div>
+	</li>
+
+	<li><h4>Severity of issue</h4>
+	<p>HIGH</p>
+	<p>This allows anyone with access to usernames to jeopardize the integrity of the data. Since the passengers' usernames are displayed prominently on the index page and I have shown that many vehicles' usernames are not secure either, anyone has access to those usernames and thus anyone can tamper with the data. 
+	</li>
+
+	<li><h4> Description of Issue</h4>
+	<p>
+	Enabling CORS not only allows someone to tamper with the data, but it allows someone to tamper with the data THROUGH SOMEONE ELSE'S BROWSER (hint: yours). The way the Not-Uber system was designed, every passenger should have one username and only use that one when sending their lat and lng. However, there is nothing stopping a user from using another username to send bodus data and corrupt their location.
+	</p>
+	</li>
+	<li><h4> Proof of Vulnerability. Show pictures or it didn't happen.</h4>
+	<p>I wrote a script that takes all the vehicles I found using the first vulnerability (JSON Query) and sends a POST request changing thier lat and lng to 13. Beneath I have 3 examples.</p>
+	<div id=cors1></div>
+	<div id=cors2></div>
+	<div id=cors3></div>
+	<p>Since I also had access to all of the passenger usernames through the index html page, I added code to the script to corrupt their data as well, but only a random 4 from the list.</p>
+	<p>In addition, I attached that script to this html page</p>
+	</li>
+
+	<li><h4> Resolution</h4>
+	<p>
+		
+	</p></li>
+	</ul>
+
+
+
+<h2>5. Conclusion</h2>
+	<p>You can also list future considerations and recommendations with costs.</p>
+
+<h2>6. References</h2>
+	<p>A list of references and links that you used for your work.</p>
+
+</body>
+</html>
+
+
+
+
