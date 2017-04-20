@@ -1,6 +1,16 @@
 body {
 	margin-left: 20%;
 	margin-right: 20%;
+	font-family: "Helvetica";
+}
+
+h2 {
+	font-size: 40px;
+	margin-top: 10%;
+}
+
+h3 {
+	font-size: 30px;
 }
 
 #nosql1{
@@ -13,17 +23,17 @@ body {
 
 #nosql2{
 	background-image: url("nosql_inj_2.png"); 
-	height: 120px;
+	height: 140px;
 	width: 950px;
-	background-size: 950px 120px;
+	background-size: 950px 140px;
 	background-repeat: no-repeat;
 }
 
 #nosqlcode{
 	background-image: url("nosql_code.png"); 
-	height: 120px;
-	width: 440px;
-	background-size: 440px 120px;
+	height: 180px;
+	width: 600px;
+	background-size: 600px 180px;
 	background-repeat: no-repeat;
 }
 
@@ -37,9 +47,9 @@ body {
 
 #indexsortcode{
 	background-image: url("index_sort_code.png"); 
-	height: 200px;
-	width: 550px;
-	background-size: 550px 200px;
+	height: 300px;
+	width: 790px;
+	background-size: 790px 300px;
 	background-repeat: no-repeat;
 }
 
@@ -53,30 +63,39 @@ body {
 
 #cors1{
 	background-image: url("cors1.png"); 
-	height: 55px;
+	height: 65px;
 	width: 650px;
-	background-size: 650px 55px;
+	background-size: 650px 65px;
 	background-repeat: no-repeat;
 	margin: 5px;
 }
+
 #cors2{
 	background-image: url("cors2.png"); 
-	height: 55px;
+	height: 70px;
 	width: 650px;
-	background-size: 650px 55px;
+	background-size: 650px 70px;
 	background-repeat: no-repeat;
 	margin: 5px;
 }
+
 #cors3{
 	background-image: url("cors3.png"); 
-	height: 55px;
+	height: 70px;
 	width: 650px;
-	background-size: 650px 55px;
+	background-size: 650px 70px;
 	background-repeat: no-repeat;
 	margin: 5px;
 }
 
-
+#cors4{
+	background-image: url("cors4.png"); 
+	height: 28px;
+	width: 650px;
+	background-size: 650px 28px;
+	background-repeat: no-repeat;
+	margin: 5px;
+}
 
 
 

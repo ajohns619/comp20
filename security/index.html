@@ -29,29 +29,12 @@
 <h2>2. Methodology</h2>
 	<p>Describe your methodology pen testing the application, including the tools that you used</p>
 
-	<p>Hacking Nodejs and mongodb: http://blog.websecurify.com/2014/08/hacking-nodejs-and-mongodb.html</p>
 
-	<p>Prevention Cheat Sheet: https://www.owasp.org/index.php/XSS_(Cross_Site_Scripting)_Prevention_Cheat_Sheet#RULE_.237_-_Prevent_DOM-based_XSS
-	</p>
-
-	<p>Mongodb injection defense, use explicit query selectors: https://thecodebarbarian.wordpress.com/2014/09/04/defending-against-query-selector-injection-attacks/</p>
 
 <h2>3. Abstract of Findings</h2>
 	<p>Provide an overview of all the security and privacy issues you identified. This section should be written for non-technical managers who do not have technical expertise and do not have time to read the entire document. Write this section using lay language.</p>
 
 <h2>4. Issues Found</h2>
-	<p>For each issue that you find, document:</p>
-	<ul>
-	<li> Issue (e.g., database injection, really bad programming practice)</li>
-	<li> Location or page where issue was found</li>
-	<li> Severity of issue (e.g., low, medium , or high). Justify your answer.</li>
-	<li> Description of issue. How did you find it? A screenshot of problem is excellent.</li>
-	<li> Proof of vulnerability. Show pictures or it didn't happen.</li>
-	<li> Resolution. Make recommendation(s) on how issue can be resolved. Show code if possible.</li>
-	</ul>
-
-
-
 	<h3>vehicle.json DB Query Trusts User Input</h3>
 	<ul>
 	<li><h4>Issue</h4>
@@ -79,7 +62,7 @@
 		<li>4aTtB30R</li>
 		<li>1fH5MXna</li>
 	</ul>
-	<p>Thus I gained access to 9 usernames without even looking at the source code or knowing a single one going in. This is a catastrophic flaw. See issue number 3 for the evil thing I did with these.</p>
+	<p>Thus I gained access to 9 usernames without even looking at the source code. This is a catastrophic flaw. See issue number 3 for the evil thing I did with these.</p>
 
 
 	<div id=nosqlcode></div>
@@ -90,10 +73,9 @@
 	<div id=nosql1></div>
 	<div id=nosql2></div>
 	</li>
-
 	<li><h4> Resolution</h4>
 	<p>This can be resolved quite easily by changing the query from {username:usernameEntry} to {username:{$eq: usernameEntry}}.
-	This specifies the query selector, so the client cannot specify their own (for example: $not NULL).
+	This specifies the query selector, so the client cannot specify their own (example: $not NULL).
 	</p></li>
 	</ul>
 
@@ -124,10 +106,8 @@
 	<div id=indexsort></div>
 	<p>These passengers are clearly not sorted based on timestamp.</p>
 	</li>
-
 	<li><h4> Resolution</h4>
-	<p>
-		This problem can be resolved by changing the query shown above (line 94) from {"_id":-1} to {"created_at":-1}. This will allow the page to follow the documentation even when passengers submit multiple resposes (HIGHLY LIKELY!).
+	<p>This problem can be resolved by changing the query shown above (line 94) from {"_id":-1} to {"created_at":-1}. This will allow the page to follow the documentation even when passengers submit multiple resposes (HIGHLY LIKELY!).
 	</p></li>
 	</ul>
 
@@ -150,37 +130,58 @@
 	<p>HIGH</p>
 	<p>This allows anyone with access to usernames to jeopardize the integrity of the data. Since the passengers' usernames are displayed prominently on the index page and I have shown that many vehicles' usernames are not secure either, anyone has access to those usernames and thus anyone can tamper with the data. 
 	</li>
-
 	<li><h4> Description of Issue</h4>
 	<p>
 	Enabling CORS not only allows someone to tamper with the data, but it allows someone to tamper with the data THROUGH SOMEONE ELSE'S BROWSER (hint: yours). The way the Not-Uber system was designed, every passenger should have one username and only use that one when sending their lat and lng. However, there is nothing stopping a user from using another username to send bodus data and corrupt their location.
 	</p>
 	</li>
-	<li><h4> Proof of Vulnerability. Show pictures or it didn't happen.</h4>
+	<li><h4> Proof of Vulnerability</h4>
 	<p>I wrote a script that takes all the vehicles I found using the first vulnerability (JSON Query) and sends a POST request changing thier lat and lng to 13. Beneath I have 3 examples.</p>
 	<div id=cors1></div>
 	<div id=cors2></div>
 	<div id=cors3></div>
 	<p>Since I also had access to all of the passenger usernames through the index html page, I added code to the script to corrupt their data as well, but only a random 4 from the list.</p>
-	<p>In addition, I attached that script to this html page</p>
+	<p>In addition, I attached that script to this html page, so whenever someone opens this, the data is just a little more corrupted. When you opened this page, the script corrupted the 9 listed vehicles and the following passengers (check the <a href="http://defense-in-derpth.herokuapp.com/">website</a>, these users now have corrupted data):</p>	
+	<div id=hacked></div>
+	<p>One of the unlucky four passengers:</p>
+	<div id=cors4></div>
 	</li>
 
 	<li><h4> Resolution</h4>
 	<p>
-		
-	</p></li>
+		This issue is a result of the /submit having absolutely no authentication for a username. One way to fix this would be to have a user login before they were able to submit for a given username. Another system might be to host the black car web application on the same website, since then CORS could be turned off entirely. In any case, having a completely open write-only route where you only need to know the username to submit for that user is extremely insecure.
+	</p>
+
+	</li>
 	</ul>
 
-
-
 <h2>5. Conclusion</h2>
-	<p>You can also list future considerations and recommendations with costs.</p>
+	<p>
+		Above I have outlined three issues with the server. The first two can be solved very easily: replace the {username:usernameEntry} query with: {username:{$eq: usernameEntry}}, and replace the sort query {"_id":-1} to {"created_at":-1}. These changes would take mere minutes to enact and the issues would be fixed and secured.
+		The third issue requires a much more fundamental change. Enabling some authentication mechanism is a huge undertaking, using some API from a third party website might be the best idea. The Facebook Login could be used as a barrier to avoid data corruption. Furthermore, the architecture of this system could be changed to disallow CORS on the POST submit route, which would further secure the server against attacks such as the one attached to this document.
+	</p>
 
 <h2>6. References</h2>
-	<p>A list of references and links that you used for your work.</p>
+	<ul>
+	<li>Hacking Nodejs and mongodb: <a href="http://blog.websecurify.com/2014/08/hacking-nodejs-and-mongodb.html">
+	<p>http://blog.websecurify.com/2014/08/hacking-nodejs-and-mongodb.html</p></a></li>
+
+	<li>Prevention Cheat Sheet: <a href="https://www.owasp.org/index.php/XSS_(Cross_Site_Scripting)_Prevention_Cheat_Sheet#RULE_.237_-_Prevent_DOM-based_XSS">
+	<p>https://www.owasp.org/index.php/XSS_(Cross_Site_Scripting)_Prevention_Cheat_Sheet#RULE_.237_-_Prevent_DOM-based_XSS</p></a></li>
+
+	<li>Mongodb injection defense: <a href="https://thecodebarbarian.wordpress.com/2014/09/04/defending-against-query-selector-injection-attacks/">
+	<p>https://thecodebarbarian.wordpress.com/2014/09/04/defending-against-query-selector-injection-attacks/</p></a></li>
+	</ul>
 
 </body>
 </html>
+
+
+
+
+
+
+
 
 
 

