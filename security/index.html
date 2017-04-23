@@ -8,34 +8,81 @@
     
     <meta charset="utf-8"/>
 </head>
-<body onload="hack_ming()">
+<body>
 
-<h1>Security Assessment</h1>
-<h2>1. Introduction</h2>
+	<h1>Security Assessment</h1>
+	<h2>1. Introduction</h2>
 	<p>
 	The NotUber web application and NotUber server are the two components to the NotUber system, which connects vehicles to passengers who have requested a ride. The web application submits, using HTTP Post, a username, latitude, and longitude, all encoded in JSON, to the server. These passengers and vehicles are saved in respective MongoDB collections.
 	</p>
 	<p>The server supports the following routes:</p>
 		<ul>
 		<li>GET /: The passengers are displayed in a list on the index page of the Server.</li>
-		<li>GET /vehicle.json followed by username query: Displays an html page with the vehicles returned from that query</li>
-		<li>POST /submit: followed by username, lat, lng: Saves that user in either vehicles or passengers database</li>
+		<li>GET /vehicle.json: Returns json of the vehicle specified as a username in the query string.</li>
+		<li>POST /submit: followed by username, lat, lng: Saves that user in either vehicles or passengers database.</li>
 		</ul>
-
 	<p>
-	In the following paragraphs I will analyze the Server at http://stormy-springs-77997.herokuapp.com/ as well as the corresponding web application to find security issues and recommend steps to improve the page's security.
+		In the following paragraphs I will analyze the Server at https://defense-in-derpth.herokuapp.com/ to find security issues and recommend steps to improve the page's security.
 	</p>
 
-<h2>2. Methodology</h2>
-	<p>Describe your methodology pen testing the application, including the tools that you used</p>
+	<h2>2. Methodology</h2>
+	<p>The initial testing was done without looking at the source code (Blackbox testing). I tried to exploit the /vehicle.json route as well as the /submit route using hacks to which my own server is vulnerable. After this initial stage I examined the <a href="https://d1b10bmlvqabco.cloudfront.net/attach/ixf77pqbt8z7pj/hbzpuemmwrz3b0/j1pq8hxeb38r/server.js">source code</a> to determine why the server was responding to certain malicious input, but not to others. The bulk of the testing was done after analyzing the source code.</p>
+	<p>I used exclusively the curl tool as well as the Google chrome browser to send user input to the server. All initial testing was done on a localhost server before attempting the same on the defense-in-derpth.herokuapp.com server.</p>
 
 
 
-<h2>3. Abstract of Findings</h2>
-	<p>Provide an overview of all the security and privacy issues you identified. This section should be written for non-technical managers who do not have technical expertise and do not have time to read the entire document. Write this section using lay language.</p>
+	<h2>3. Abstract of Findings</h2>
+	<p>The server includes two main security vulnerability and one code flaw where the program does not behave as specified in the Assingment 3 <a href="https://tuftsdev.github.io/WebProgramming/assignments/a3.html">instructions</a>.</p>
+	<p>
+		Firstly, the documentation specifies that the index page should render a page with all passengers ordered by timestamp. However, the index page actually sorts them based on their _id value, which would only correspond to the timestamp ordering if users could not update their info. As soon as users update their latitudes and longitudes, this invariant does not hold up.
+	</p>
 
-<h2>4. Issues Found</h2>
-	<h3>vehicle.json DB Query Trusts User Input</h3>
+	<p>
+		Secondly, a malicious user has far more access to vehicle data than advisable. Even without previously knowing any vehicle's username, it is possible to extract the data for many vehicles by querying the /vehicle.json route.
+	</p>
+	<p>
+		And lastly, the current architecture leaves a submission route completely open for anyone with a username to alter that user's information. Since the index page displays all passengers' usernames and the vehicles' usernames are easily acquired (as described above), this puts their data in jeopardy. Additionally, since this route is available from other urls apart from this server, other websites can access this route through the browser visiting that page and alter that information as well.
+	</p>
+
+
+
+
+	<h2>4. Issues Found</h2>
+
+	<h3>Index Displays Users in Incorrect Order</h3>
+	<ul>
+
+	<li><h4>Issue</h4>
+	<p>Divergence from the API contracts as specified in the <a href="https://tuftsdev.github.io/WebProgramming/assignments/a3.html">assignment instructions</a>.</p></li>
+	<li><h4>Location</h4>
+	<p>GET / route</p></li>
+
+	<li><h4>Severity of issue</h4>
+	<p>HIGH</p>
+	<p>
+		This is not necessarily a security issue, but declaring one thing in a route contract and executing another in the function can get confusing for developers relying on this API, and could become a nightmare to maintain.
+	</p></li>
+
+	<li><h4> Description of Issue</h4>
+	<p>
+		When loading the passengers onto the HTML page that is sent when the GET / route is accessed, the program sorts them based on _id, not created_at. This means that the passenger with the highest _id value rises to the top, instead of the passenger with the most recent timestamp. The likely behavior is that the passengers are sorted based on when they submitted their first submission. Thus the code is technically correct, until passengers start submitting multiple submissions, updating their locations and thus their timestamp.
+	</p>
+	<div id=indexsortcode></div>
+	</li>
+	<li><h4> Proof of Vulnerability</h4>
+	<div id=indexsort></div>
+	<p>These passengers are clearly not sorted based on timestamp.</p>
+	</li>
+	<li><h4> Resolution</h4>
+	<p>This problem can be resolved by changing the query shown above (line 94) from {"_id":-1} to {"created_at":-1}. This will allow the page to follow the documentation even when passengers submit multiple resposes (HIGHLY LIKELY!).
+	</p></li>
+	</ul>
+
+
+	<div class="space"></div>
+
+
+	<h3>vehicle.json Route Trusts User Input</h3>
 	<ul>
 	<li><h4>Issue</h4>
 	<p>NoSQL Injection</p></li>
@@ -69,51 +116,19 @@
 	<p>Above is the problematic code. It takes the usernameEntry query string and uses that as the query without validation.</p>
 	</li>
 
-	<li><h4> Proof of Vulnerability. Show pictures or it didn't happen.</h4>
-	<div id=nosql1></div>
-	<div id=nosql2></div>
+	<li><h4> Proof of Vulnerability</h4>
+		<div id=nosql1></div>
+		<div id=nosql2></div>
 	</li>
 	<li><h4> Resolution</h4>
-	<p>This can be resolved quite easily by changing the query from {username:usernameEntry} to {username:{$eq: usernameEntry}}.
-	This specifies the query selector, so the client cannot specify their own (example: $not NULL).
-	</p></li>
+		<p>This can be resolved quite easily by changing the query from {username:usernameEntry} to {username:{$eq: usernameEntry}}.
+		This specifies the query selector, so the client cannot specify their own (example: $not NULL).
+		</p>
+	</li>
 	</ul>
 
 
-
-
-
-	<h3>Index Displays Users in Incorrect Order</h3>
-	<ul>
-	<li><h4>Issue</h4>
-	<p>Divergence from the API contracts as specified in the <a href="https://tuftsdev.github.io/WebProgramming/assignments/a3.html">assignment instructions</a>.</p></li>
-	<li><h4>Location</h4>
-	<p>GET / route</p></li>
-
-	<li><h4>Severity of issue</h4>
-	<p>MEDIUM</p>
-	<p>
-		This is not necessarily a security issue, however since declaring one thing in a route contract and executing another in the function can get confusing for developers relying on this API, and could become a nightmare to maintain
-	</p></li>
-
-	<li><h4> Description of Issue</h4>
-	<p>
-		When loading the passengers onto the HTML page that is sent when the GET / route is accessed, the program sorts them based on _id, not created_at. This means that the passenger with the highest _id value rises to the top, instead of the passenger with the most recent timestamp. The likely behavior is that the passengers are sorted based on when they submitted their first submission. Thus the code is technically correct, until passengers start submitting multiple submissions, updating their locations and thus their timestamp.
-	</p>
-	<div id=indexsortcode></div>
-	</li>
-	<li><h4> Proof of Vulnerability. Show pictures or it didn't happen.</h4>
-	<div id=indexsort></div>
-	<p>These passengers are clearly not sorted based on timestamp.</p>
-	</li>
-	<li><h4> Resolution</h4>
-	<p>This problem can be resolved by changing the query shown above (line 94) from {"_id":-1} to {"created_at":-1}. This will allow the page to follow the documentation even when passengers submit multiple resposes (HIGHLY LIKELY!).
-	</p></li>
-	</ul>
-
-
-
-
+	<div class="space"></div>
 
 
 	<h3>CORS is Enabled on the POST /submit Route</h3>
@@ -132,20 +147,27 @@
 	</li>
 	<li><h4> Description of Issue</h4>
 	<p>
-	Enabling CORS not only allows someone to tamper with the data, but it allows someone to tamper with the data THROUGH SOMEONE ELSE'S BROWSER (hint: yours). The way the Not-Uber system was designed, every passenger should have one username and only use that one when sending their lat and lng. However, there is nothing stopping a user from using another username to send bodus data and corrupt their location.
+	Enabling CORS not only allows someone to tamper with the data, but it allows someone to tamper with the data THROUGH SOMEONE ELSE'S BROWSER. The way the Not-Uber system was designed, every passenger should have one username and only use that one when sending their lat and lng. However, there is nothing stopping a user from using another username to send bodus data and corrupt their location.
 	</p>
 	</li>
 	<li><h4> Proof of Vulnerability</h4>
-	<p>I wrote a script that takes all the vehicles I found using the first vulnerability (JSON Query) and sends a POST request changing thier lat and lng to 13. Beneath I have 3 examples.</p>
+	<p>I wrote a script that takes all the vehicles I found using the second vulnerability (JSON Query) and sends a POST request changing thier lat and lng to 13. Beneath I have 3 examples.</p>
 	<div id=cors1></div>
 	<div id=cors2></div>
 	<div id=cors3></div>
 	<p>Since I also had access to all of the passenger usernames through the index html page, I added code to the script to corrupt their data as well, but only a random 4 from the list.</p>
-	<p>In addition, I attached that script to this html page, so whenever someone opens this, the data is just a little more corrupted. When you opened this page, the script corrupted the 9 listed vehicles and the following passengers (check the <a href="http://defense-in-derpth.herokuapp.com/">website</a>, these users now have corrupted data):</p>	
+
+	<div id=hackbtn onclick="hack_ming()">Hack the page</div>
+
+	<p>In addition, I attached that script to the button above, so whenever that button is clicked, the data gets just a little more corrupted. At every button-press, the script corrupts the 9 listed vehicles and 4 random passengers.</p>
+	<p>Press the button and the unlucky passengers will be listed below (check the <a href="http://defense-in-derpth.herokuapp.com/">website</a>):</p>	
 	<div id=hacked></div>
 	<p>One of the unlucky four passengers:</p>
 	<div id=cors4></div>
+
+	<p>I did not only attach this button because it is cool and interesting. It shows the danger of opening a route like submit to cross-origin resource sharing: not only can I damage the integrity of the data from my computer, but I can distribute these attacks to other browsers and servers.</p>
 	</li>
+
 
 	<li><h4> Resolution</h4>
 	<p>
@@ -154,6 +176,10 @@
 
 	</li>
 	</ul>
+
+
+	
+	<div class="space"></div>
 
 <h2>5. Conclusion</h2>
 	<p>
@@ -166,13 +192,17 @@
 	<li>Hacking Nodejs and mongodb: <a href="http://blog.websecurify.com/2014/08/hacking-nodejs-and-mongodb.html">
 	<p>http://blog.websecurify.com/2014/08/hacking-nodejs-and-mongodb.html</p></a></li>
 
-	<li>Prevention Cheat Sheet: <a href="https://www.owasp.org/index.php/XSS_(Cross_Site_Scripting)_Prevention_Cheat_Sheet#RULE_.237_-_Prevent_DOM-based_XSS">
+	<li>CSS Prevention Cheat Sheet: <a href="https://www.owasp.org/index.php/XSS_(Cross_Site_Scripting)_Prevention_Cheat_Sheet#RULE_.237_-_Prevent_DOM-based_XSS">
 	<p>https://www.owasp.org/index.php/XSS_(Cross_Site_Scripting)_Prevention_Cheat_Sheet#RULE_.237_-_Prevent_DOM-based_XSS</p></a></li>
 
 	<li>Mongodb injection defense: <a href="https://thecodebarbarian.wordpress.com/2014/09/04/defending-against-query-selector-injection-attacks/">
 	<p>https://thecodebarbarian.wordpress.com/2014/09/04/defending-against-query-selector-injection-attacks/</p></a></li>
+	<li>Cross Origin Resource Sharing Risks: <a href="https://code.google.com/archive/p/html5security/wikis/CrossOriginRequestSecurity.wiki"><p>https://code.google.com/archive/p/html5security/wikis/CrossOriginRequestSecurity.wiki</p></a>
 	</ul>
 
+
+
+	<div class="space"></div>
 </body>
 </html>
 

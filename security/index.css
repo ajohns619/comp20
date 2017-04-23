@@ -4,6 +4,11 @@ body {
 	font-family: "Helvetica";
 }
 
+h1 {
+	font-size: 55px;
+	text-align: center;
+}
+
 h2 {
 	font-size: 40px;
 	margin-top: 10%;
@@ -13,7 +18,16 @@ h3 {
 	font-size: 30px;
 }
 
-#nosql1{
+h4 {
+	font-size: 25px;
+}
+
+ul {
+	list-style-type: none;
+	margin-bottom: 0px;
+}
+
+#nosql1 {
 	background-image: url("nosql_inj_1.png"); 
 	height: 120px;
 	width: 800px;
@@ -21,7 +35,7 @@ h3 {
 	background-repeat: no-repeat;
 }
 
-#nosql2{
+#nosql2 {
 	background-image: url("nosql_inj_2.png"); 
 	height: 140px;
 	width: 950px;
@@ -29,7 +43,7 @@ h3 {
 	background-repeat: no-repeat;
 }
 
-#nosqlcode{
+#nosqlcode {
 	background-image: url("nosql_code.png"); 
 	height: 180px;
 	width: 600px;
@@ -37,15 +51,15 @@ h3 {
 	background-repeat: no-repeat;
 }
 
-#indexsort{
+#indexsort {
 	background-image: url("index_sort.png"); 
-	height: 420px;
+	height: 480px;
 	width: 800px;
-	background-size: 800px 420px;
+	background-size: 800px 480px;
 	background-repeat: no-repeat;
 }
 
-#indexsortcode{
+#indexsortcode {
 	background-image: url("index_sort_code.png"); 
 	height: 300px;
 	width: 790px;
@@ -53,7 +67,7 @@ h3 {
 	background-repeat: no-repeat;
 }
 
-#corscode{
+#corscode {
 	background-image: url("corscode.png"); 
 	height: 40px;
 	width: 550px;
@@ -61,7 +75,7 @@ h3 {
 	background-repeat: no-repeat;
 }
 
-#cors1{
+#cors1 {
 	background-image: url("cors1.png"); 
 	height: 65px;
 	width: 650px;
@@ -70,7 +84,7 @@ h3 {
 	margin: 5px;
 }
 
-#cors2{
+#cors2 {
 	background-image: url("cors2.png"); 
 	height: 70px;
 	width: 650px;
@@ -79,7 +93,7 @@ h3 {
 	margin: 5px;
 }
 
-#cors3{
+#cors3 {
 	background-image: url("cors3.png"); 
 	height: 70px;
 	width: 650px;
@@ -88,7 +102,7 @@ h3 {
 	margin: 5px;
 }
 
-#cors4{
+#cors4 {
 	background-image: url("cors4.png"); 
 	height: 28px;
 	width: 650px;
@@ -97,9 +111,23 @@ h3 {
 	margin: 5px;
 }
 
+#hackbtn {
+	background-color: red;
+	width: 120px;
 
+    padding: 15px 32px;
+	border-radius: 12px;
+	border: solid 3px;
+	border-color: #680101;
+	text-align: center;
+}
 
+#hackbtn:hover {
+	background-color: #ffd8d8;
+}
 
-
+.space {
+	height: 180px;
+}
 
 
