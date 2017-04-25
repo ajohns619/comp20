@@ -10,7 +10,7 @@ function hack_ming(){
 	for (i = 0; i < 4; i++){
 		randnr = Math.floor((Math.random() * 83));
 		document.getElementById('hacked').innerHTML += "<p>" + passengers[randnr] + "</p>";
-		send_req(passengers[randnr]);
+		//send_req(passengers[randnr]);
 	}
 }
 
